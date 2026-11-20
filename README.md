@@ -28,3 +28,14 @@ python -m src.data_prep data/raw/online_retail_II.xlsx
 pytest -q
 ```
 No dataset yet? `python -m src.synth` writes a synthetic file in the same layout to `data/raw/`.
+
+## Step 6: real-time pipeline (Kafka + Redis)
+Open Docker Desktop first, then, in separate terminals (venv active):
+```bash
+docker compose up -d                       # Kafka + Redis
+python -m src.seed_redis                   # history up to the test period -> Redis
+python -m src.stream_consumer              # terminal A: waits for events, stops after 20 s idle
+python -m src.replay_producer --rate 25    # terminal B: replays the test period
+python -m src.stream_eval                  # after the consumer has stopped
+docker compose down
+```

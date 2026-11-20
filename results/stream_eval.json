@@ -1,0 +1,20 @@
+{
+  "events_processed": 4188,
+  "tie_events_excluded_from_check": 74,
+  "max_abs_score_diff_vs_offline": 1.5874176026997588e-06,
+  "max_abs_clv_diff_vs_offline": 1.8447265617282937e-06,
+  "top1_agreement_with_offline": 1.0,
+  "events_with_a_later_purchase": 2649,
+  "live_top1": 0.3318233295583239,
+  "live_top3": 0.5956964892412231,
+  "live_f1": 0.2425324969702284,
+  "processing_ms_median": 6.311,
+  "processing_ms_p95": 8.225149999999996,
+  "end_to_end_ms_median": 13.285,
+  "end_to_end_ms_p95": 17.068949999999997,
+  "consumer": {
+    "events": 4188,
+    "cpu_seconds": 29.960406,
+    "wall_seconds": 207.38059401512146
+  }
+}
