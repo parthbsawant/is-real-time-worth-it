@@ -8,3 +8,5 @@ streamlit>=1.35
 kafka-python>=2.0.2
 redis>=5.0
 pytest>=8.0
+fastapi>=0.110
+uvicorn>=0.29
