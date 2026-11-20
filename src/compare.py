@@ -56,8 +56,11 @@ def run_cost(model, meta, hist, events, step, origin):
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser(); ap.add_argument("--variant", default="base", choices=["base", "age"])
+    variant = ap.parse_args().variant
     meta = json.loads((PROC_DIR / "meta.json").read_text())
-    model, info = load_serving_model()
+    model, info = load_serving_model(variant)
     z = np.load(PROC_DIR / "test.npz")
     p = pd.read_csv(PROC_DIR / "purchases.csv", dtype={"customer_id": str})
     seg = pd.read_csv(PROC_DIR / "customers.csv", dtype={"customer_id": str}).set_index("customer_id")["segment"]
@@ -74,6 +77,7 @@ def main():
         wins = example_windows(z, hist, step, origin)
         scores, clv, n_cold = predict_examples(model, meta, wins, prior, mu)
         m = summarise(scores, clv, z["y_cat"], z["y_clv"])
+        np.savez_compressed(RESULT_DIR / f"preds_{variant}_{name}.npz", scores=scores, clv=clv)   # for significance.py
         m["top1_by_segment"] = {int(s): float((scores[seg_of == s].argmax(1) == z["y_cat"][seg_of == s]).mean())
                                 for s in (1, 2, 3, 4)}
         m["no_history_fallbacks"] = n_cold
@@ -88,8 +92,8 @@ def main():
     base = out["batch_hourly"]["seconds"]
     for name, _ in PIPELINES:
         out[name]["compute_vs_hourly"] = out[name]["seconds"] / base
-    (RESULT_DIR / "pipeline_comparison.json").write_text(json.dumps(out, indent=2))
-    print(f"serving model: {info['arch']} seed {info['seed']}   test examples: {out['test_examples']}   "
+    (RESULT_DIR / ("pipeline_comparison_age.json" if variant == "age" else "pipeline_comparison.json")).write_text(json.dumps(out, indent=2))
+    print(f"variant: {variant}   serving model: {info['arch']} seed {info['seed']}   test examples: {out['test_examples']}   "
           f"test-period purchases: {len(events)}")
     print(f"{'pipeline':<14}{'top1':>7}{'top3':>7}{'f1':>7}{'MAE':>8}{'stale_med_h':>13}{'infer':>8}{'sec':>8}{'x hourly':>10}{'lat_ms':>8}")
     for name, _ in PIPELINES:

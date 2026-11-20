@@ -141,19 +141,21 @@ def build_examples(p: pd.DataFrame):
             j_end = np.searchsorted(ts, h_end, side="right")
             clv = cum[j_end] - cum[i]
             rows[split].append((cid, t_pred, cats[lo:i], np.log1p(gaps), np.log1p(np.maximum(amt[lo:i], 0)),
-                                int(cats[i]) - 1, float(np.log1p(max(clv, 0.0))), ts[i]))
+                                int(cats[i]) - 1, float(np.log1p(max(clv, 0.0))), ts[i],
+                                float(np.log1p(max((ts[i] - ts[i - 1]) / np.timedelta64(1, 'D'), 0.0)))))
     out = {}
     for name, items in rows.items():
         if not items:
             out[name] = None
             continue
-        enc = [encode_window(c, gp, am) for _, _, c, gp, am, _, _, _ in items]
+        enc = [encode_window(c, gp, am) for _, _, c, gp, am, *_ in items]
         out[name] = {
             "customer_id": np.array([r[0] for r in items]),
             "t_pred": np.array([np.datetime64(r[1], "s").astype("int64") for r in items]),
             "cat": np.stack([e[0] for e in enc]), "gap": np.stack([e[1] for e in enc]),
             "amt": np.stack([e[2] for e in enc]), "mask": np.stack([e[3] for e in enc]),
             "t_target": np.array([np.datetime64(r[7], "s").astype("int64") for r in items]),
+            "age": np.array([r[8] for r in items], dtype=np.float32),
             "y_cat": np.array([r[5] for r in items], dtype=np.int64),
             "y_clv": np.array([r[6] for r in items], dtype=np.float32),
         }

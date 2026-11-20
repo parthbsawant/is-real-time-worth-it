@@ -31,7 +31,7 @@ def load(split, meta):
     t = lambda a, dt=torch.float32: torch.as_tensor(a, dtype=dt)
     amt = (z["amt"] - meta["amt_mean"]) / meta["amt_std"] * z["mask"]
     return dict(cat=t(z["cat"], torch.long), gap=t(z["gap"] / GAP_SCALE) * t(z["mask"]), amt=t(amt),
-                mask=t(z["mask"]), y_cat=t(z["y_cat"], torch.long), y_clv=t((z["y_clv"] - mu) / sd),
+                mask=t(z["mask"]), age=t(z["age"] / GAP_SCALE), y_cat=t(z["y_cat"], torch.long), y_clv=t((z["y_clv"] - mu) / sd),
                 y_clv_raw=t(z["y_clv"]))
 
 
@@ -48,13 +48,13 @@ def predict(model, d, dev, bs=1024):
     model.eval()
     s, c = [], []
     for b in batches(d, bs, False, dev):
-        logits, clv = model(b["cat"], b["gap"], b["amt"], b["mask"])
+        logits, clv = model(b["cat"], b["gap"], b["amt"], b["mask"], b["age"] if model.use_age else None)
         s.append(logits.cpu()); c.append(clv.cpu())
     return torch.cat(s).numpy(), torch.cat(c).numpy()
 
 
 def loss_fn(model, b):
-    logits, clv = model(b["cat"], b["gap"], b["amt"], b["mask"])
+    logits, clv = model(b["cat"], b["gap"], b["amt"], b["mask"], b["age"] if model.use_age else None)
     return F.cross_entropy(logits, b["y_cat"]) + F.mse_loss(clv, b["y_clv"])      # weighting 1 : 1
 
 
@@ -65,17 +65,18 @@ def main():
     ap.add_argument("--epochs", type=int, default=30)
     ap.add_argument("--patience", type=int, default=5)
     ap.add_argument("--batch", type=int, default=256)
+    ap.add_argument("--age", action="store_true", help="follow-up experiment: add the elapsed-time input")
     ap.add_argument("--device", default="cpu", choices=["cpu", "mps", "cuda"])
     a = ap.parse_args()
     torch.manual_seed(a.seed); np.random.seed(a.seed)
     meta = json.loads((PROC_DIR / "meta.json").read_text())
     dev = device(a.device)
     tr, va = load("train", meta), load("val", meta)
-    model = SeqModel(a.arch).to(dev)
+    model = SeqModel(a.arch, use_age=a.age).to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
-    print(f"{a.arch}  params={n_params(model):,}  device={dev}  train={len(tr['y_cat'])}  val={len(va['y_cat'])}")
+    print(f"{a.arch}{' + age input' if a.age else ''}  params={n_params(model):,}  device={dev}  train={len(tr['y_cat'])}  val={len(va['y_cat'])}")
     best, bad, hist, t0 = 1e9, 0, [], time.time()
-    tag = f"{a.arch}_seed{a.seed}"
+    tag = f"{a.arch}{'_age' if a.age else ''}_seed{a.seed}"
     MODEL_DIR.mkdir(exist_ok=True); RESULT_DIR.mkdir(exist_ok=True)
     for ep in range(1, a.epochs + 1):
         model.train(); tot, n = 0.0, 0
@@ -99,7 +100,7 @@ def main():
     s, c = predict(model, va, dev)
     mu, sd = clv_stats()
     m = summarise(s, c * sd + mu, va["y_cat"].numpy(), va["y_clv_raw"].numpy())
-    out = {"arch": a.arch, "seed": a.seed, "params": n_params(model), "epochs_run": len(hist),
+    out = {"arch": a.arch, "age": a.age, "seed": a.seed, "params": n_params(model), "epochs_run": len(hist),
            "best_epoch": int(np.argmin([h["val_loss"] for h in hist]) + 1),
            "train_minutes": round((time.time() - t0) / 60, 2), "history": hist, "val": m}
     (RESULT_DIR / f"train_{tag}.json").write_text(json.dumps(out, indent=2))

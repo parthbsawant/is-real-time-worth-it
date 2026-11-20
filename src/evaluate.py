@@ -16,16 +16,20 @@ KEYS = ["top1", "top3", "f1", "clv_mae", "clv_rmse"]
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser(); ap.add_argument("--variant", default="base", choices=["base", "age"])
+    age = ap.parse_args().variant == "age"
+    sfx = "_age" if age else ""
     meta = json.loads((PROC_DIR / "meta.json").read_text())
     te, mu_sd = load("test", meta), clv_stats()
     mu, sd = mu_sd
     per_model, best = {}, None
     for arch in ("lstm", "transformer"):
         runs = []
-        for f in sorted(RESULT_DIR.glob(f"train_{arch}_seed*.json")):
+        for f in sorted(RESULT_DIR.glob(f"train_{arch}{sfx}_seed*.json")):
             info = json.loads(f.read_text())
-            model = SeqModel(arch)
-            model.load_state_dict(torch.load(MODEL_DIR / f"{arch}_seed{info['seed']}.pt", map_location="cpu"))
+            model = SeqModel(arch, use_age=age)
+            model.load_state_dict(torch.load(MODEL_DIR / f"{arch}{sfx}_seed{info['seed']}.pt", map_location="cpu"))
             s, c = predict(model, te, "cpu")
             m = summarise(s, c * sd + mu, te["y_cat"].numpy(), te["y_clv_raw"].numpy())
             m.update(seed=info["seed"], best_val_loss=min(h["val_loss"] for h in info["history"]))
@@ -45,8 +49,8 @@ def main():
         print(f"{'   std over seeds':<26}" + "".join(
             f"{row[k][1]:>11.3f}" if 'clv' not in k else f"{row[k][1]:>11.0f}" for k in KEYS))
     summary["serving_model"] = best
-    (RESULT_DIR / "model_comparison.json").write_text(json.dumps(summary, indent=2))
-    (RESULT_DIR / "serving_model.json").write_text(json.dumps(best, indent=2))
+    (RESULT_DIR / f"model_comparison{sfx}.json").write_text(json.dumps(summary, indent=2))
+    (RESULT_DIR / f"serving_model{sfx}.json").write_text(json.dumps(best, indent=2))
     print("serving model for the pipelines:", best)
 
 

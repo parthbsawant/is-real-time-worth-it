@@ -38,3 +38,13 @@ def test_one_training_step(arch):
     loss = torch.nn.functional.cross_entropy(logits, torch.randint(0, N_CAT, (8,))) + clv.pow(2).mean()
     loss.backward(); opt.step()
     assert torch.isfinite(loss)
+
+
+@pytest.mark.parametrize("arch", ["lstm", "transformer"])
+def test_age_variant_shapes_and_uses_age(arch):
+    m = SeqModel(arch, use_age=True).eval()
+    cat, gap, amt, mask = batch()
+    a1, a2 = torch.zeros(8), torch.full((8,), 2.0)
+    (l1, c1), (l2, c2) = m(cat, gap, amt, mask, a1), m(cat, gap, amt, mask, a2)
+    assert l1.shape == (8, N_CAT) and c1.shape == (8,)
+    assert not torch.allclose(l1, l2)               # the elapsed-time input changes the output

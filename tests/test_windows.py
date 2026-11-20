@@ -42,3 +42,11 @@ def test_batch_cutoff_never_sees_later_purchases(data):
             n = int(w[3].sum())
             used = ts[ts <= min(cutoff, t - 1)]
             assert n <= len(used) and n <= 20
+
+
+def test_age_matches_training_array(data):
+    z, hist = data
+    for k in range(0, len(z["y_cat"]), max(1, len(z["y_cat"]) // 60)):
+        t = int(z["t_target"][k])
+        w = window_at(hist[str(z["customer_id"][k])], t - 1, t)
+        assert abs(w[4] - float(z["age"][k])) < 1e-4

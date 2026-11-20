@@ -9,10 +9,12 @@ from .models import SeqModel
 from .train import GAP_SCALE, clv_stats
 
 
-def load_serving_model():
-    info = json.loads((RESULT_DIR / "serving_model.json").read_text())
-    model = SeqModel(info["arch"])
-    model.load_state_dict(torch.load(MODEL_DIR / f"{info['arch']}_seed{info['seed']}.pt", map_location="cpu"))
+def load_serving_model(variant="base"):
+    age = variant == "age"
+    info = json.loads((RESULT_DIR / ("serving_model_age.json" if age else "serving_model.json")).read_text())
+    model = SeqModel(info["arch"], use_age=age)
+    tag = f"{info['arch']}{'_age' if age else ''}_seed{info['seed']}"
+    model.load_state_dict(torch.load(MODEL_DIR / f"{tag}.pt", map_location="cpu"))
     return model.eval(), info
 
 
@@ -26,8 +28,10 @@ def infer(model, wins, meta, bs=512):
     mask = torch.as_tensor(np.stack([w[3] for w in wins]), dtype=torch.float32)
     gap = torch.as_tensor(np.stack([w[1] for w in wins]), dtype=torch.float32) / GAP_SCALE * mask
     amt = torch.as_tensor((np.stack([w[2] for w in wins]) - meta["amt_mean"]) / meta["amt_std"], dtype=torch.float32) * mask
+    age = torch.as_tensor([w[4] for w in wins], dtype=torch.float32) / GAP_SCALE if model.use_age else None
     s, c = [], []
     for i in range(0, len(wins), bs):
-        lo, cl = model(cat[i:i + bs], gap[i:i + bs], amt[i:i + bs], mask[i:i + bs])
+        lo, cl = model(cat[i:i + bs], gap[i:i + bs], amt[i:i + bs], mask[i:i + bs],
+                       age[i:i + bs] if model.use_age else None)
         s.append(lo.numpy()); c.append(cl.numpy())
     return np.concatenate(s), np.concatenate(c) * sd + mu

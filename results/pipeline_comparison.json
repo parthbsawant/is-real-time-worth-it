@@ -22,9 +22,9 @@
     "staleness_hours_median": 0.48333333333333334,
     "staleness_hours_p95": 0.9333333333333333,
     "inferences": 3794,
-    "seconds": 0.211713208999754,
-    "latency_ms_median": 0.04326888086048086,
-    "latency_ms_p95": 0.05492103333121382,
+    "seconds": 0.21823879200019292,
+    "latency_ms_median": 0.04294930078074799,
+    "latency_ms_p95": 0.05190476191013919,
     "compute_vs_hourly": 1.0
   },
   "batch_daily": {
@@ -43,10 +43,10 @@
     "staleness_hours_median": 11.133333333333333,
     "staleness_hours_p95": 14.866666666666667,
     "inferences": 3668,
-    "seconds": 0.2035479159994793,
-    "latency_ms_median": 0.043684488282735856,
-    "latency_ms_p95": 0.04626245117300698,
-    "compute_vs_hourly": 0.9614322930588418
+    "seconds": 0.22229241599961824,
+    "latency_ms_median": 0.046084228515042014,
+    "latency_ms_p95": 0.05440608593687557,
+    "compute_vs_hourly": 1.018574259700914
   },
   "batch_weekly": {
     "top1": 0.3879066478076379,
@@ -64,10 +64,10 @@
     "staleness_hours_median": 104.60833333333332,
     "staleness_hours_p95": 156.3,
     "inferences": 3402,
-    "seconds": 0.18955304200062528,
-    "latency_ms_median": 0.04350244140560733,
-    "latency_ms_p95": 0.0513352272719203,
-    "compute_vs_hourly": 0.8953293131598867
+    "seconds": 0.1946678329986753,
+    "latency_ms_median": 0.04413680077774984,
+    "latency_ms_p95": 0.050781945455210836,
+    "compute_vs_hourly": 0.8919946413491109
   },
   "streaming": {
     "top1": 0.3910891089108911,
@@ -85,9 +85,9 @@
     "staleness_hours_median": 0.0,
     "staleness_hours_p95": 0.0,
     "inferences": 4188,
-    "seconds": 5.028680125000392,
-    "latency_ms_median": 1.1521044998517027,
-    "latency_ms_p95": 1.3553960498484228,
-    "compute_vs_hourly": 23.752321117603177
+    "seconds": 5.400510082999972,
+    "latency_ms_median": 1.232416499988176,
+    "latency_ms_p95": 1.4513915494717364,
+    "compute_vs_hourly": 24.74587598979744
   }
 }

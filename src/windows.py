@@ -38,7 +38,7 @@ def tick_ceil(t: int, origin: int, step: int) -> int:
 
 def window_at(hist, cutoff_ts: int, target_ts: int):
     """Model input from purchases recorded up to `cutoff_ts` (inclusive) and strictly before
-    the target purchase. Returns (cat, gap, amt, mask) or None when there is no history."""
+    the target purchase. Returns (cat, gap, amt, mask, age) or None when there is no history."""
     ts, cat, amt = hist
     n = min(np.searchsorted(ts, cutoff_ts, side="right"), np.searchsorted(ts, target_ts, side="left"))
     if n == 0:
@@ -46,4 +46,5 @@ def window_at(hist, cutoff_ts: int, target_ts: int):
     lo = max(0, n - WINDOW)
     w = ts[lo:n]
     gaps = np.diff(np.concatenate([[w[0]], w])).astype(float) / 86400.0
-    return encode_window(cat[lo:n], np.log1p(gaps), np.log1p(np.maximum(amt[lo:n], 0)))
+    age = float(np.log1p(max(target_ts - w[-1], 0) / 86400.0))      # newest purchase seen -> moment of use
+    return encode_window(cat[lo:n], np.log1p(gaps), np.log1p(np.maximum(amt[lo:n], 0))) + (age,)
