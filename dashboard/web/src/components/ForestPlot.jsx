@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatCiVal } from '../format';
 
 export default function ForestPlot({ significance }) {
   const [metric, setMetric] = useState('top1'); // 'top1' or 'mae'
@@ -60,7 +61,7 @@ export default function ForestPlot({ significance }) {
         <div className="forest-plot-title-group">
           <h3 className="card-title">Is the difference real?</h3>
           <span className="card-subtitle">
-            95% bootstrap confidence intervals for Real-Time gain over batch
+            95% bootstrap confidence intervals for Real-Time gain over batch (2 decimals)
           </span>
         </div>
         <div className="metric-toggle-group">
@@ -146,8 +147,10 @@ export default function ForestPlot({ significance }) {
             const fillColor = isGrey ? '#8C8C8C' : '#7A4E24';
 
             const unit = metric === 'top1' ? 'pt' : '£';
-            const formattedEst = `${row.estimate >= 0 ? '+' : ''}${row.estimate.toFixed(1)} ${unit}`;
-            const formattedCi = `[${row.ciLow.toFixed(1)}, ${row.ciHigh.toFixed(1)}]`;
+            const formattedEst = metric === 'top1'
+              ? `${formatCiVal(row.estimate, 2, true)} pt`
+              : `${formatCiVal(row.estimate, 2, true)} £`;
+            const formattedCi = `[${formatCiVal(row.ciLow, 2, true)}, ${formatCiVal(row.ciHigh, 2, true)}]`;
 
             return (
               <g key={row.key} className={`forest-row ${isGrey ? 'greyed' : 'significant'}`}>
@@ -228,8 +231,8 @@ export default function ForestPlot({ significance }) {
       <div className="forest-plot-footer">
         <p className="forest-note">
           {metric === 'top1'
-            ? 'Points represent Top-1 percentage point differences (Real-Time minus Batch). Horizontal bars depict the 95% bootstrap confidence interval. Intervals crossing the vertical zero line indicate no statistically detectable benefit.'
-            : 'Points represent CLV Mean Absolute Error differences (positive indicates Real-Time achieved lower error).'}
+            ? 'Points show Top-1 percentage point differences (Real-Time minus Batch) with 95% bootstrap confidence intervals. Intervals spanning zero indicate no statistically detectable accuracy benefit.'
+            : 'Points show CLV Mean Absolute Error differences (positive indicates Real-Time achieved lower error by that amount in £).'}
         </p>
       </div>
     </div>

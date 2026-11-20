@@ -1,6 +1,12 @@
-export function formatGbp(val) {
+export function formatGbp(val, decimals = 0) {
   if (val == null || isNaN(val)) return '—';
-  return `£${Math.round(val).toLocaleString()}`;
+  if (decimals === 0) {
+    return `£${Math.round(val).toLocaleString()}`;
+  }
+  return `£${Number(val).toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`;
 }
 
 export function formatPct(val, decimals = 1) {
@@ -8,10 +14,9 @@ export function formatPct(val, decimals = 1) {
   return `${(val * 100).toFixed(decimals)}%`;
 }
 
-export function formatPoints(val, decimals = 1, showSign = true) {
+export function formatPoints(val, decimals = 2, showSign = true) {
   if (val == null || isNaN(val)) return '—';
-  const sign = showSign && val > 0 ? '+' : '';
-  return `${sign}${val.toFixed(decimals)} pt`;
+  return formatCiVal(val, decimals, showSign) + ' pt';
 }
 
 export function formatNumber(val, decimals = 0) {
@@ -21,6 +26,31 @@ export function formatNumber(val, decimals = 0) {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+}
+
+/**
+ * Format confidence interval or delta values.
+ * Strictly avoids -0.0 or -0.00 by converting -0 to 0.
+ * Default 2 decimals for precision and clean presentation.
+ */
+export function formatCiVal(val, decimals = 2, showSign = true) {
+  if (val == null || isNaN(val)) return '—';
+  let num = Number(Number(val).toFixed(decimals));
+  // Eliminate negative zero: -0 or -0.00 -> 0
+  if (Object.is(num, -0) || Math.abs(num) < 1e-12) {
+    num = 0;
+  }
+  const sign = showSign && num > 0 ? '+' : '';
+  return `${sign}${num.toFixed(decimals)}`;
+}
+
+export function formatInterval(low, high, decimals = 2, prefix = '', suffix = '') {
+  if (low == null || high == null) return '—';
+  const formattedLow = formatCiVal(low, decimals, true);
+  const formattedHigh = formatCiVal(high, decimals, true);
+  const p = prefix ? `${prefix} ` : '';
+  const s = suffix ? ` ${suffix}` : '';
+  return `${p}${formattedLow} to ${formattedHigh}${s}`;
 }
 
 export function formatStaleness(hours, kafkaCheck = null) {

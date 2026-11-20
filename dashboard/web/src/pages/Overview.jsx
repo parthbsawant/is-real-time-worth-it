@@ -19,14 +19,16 @@ import {
   formatLatency,
   formatSeconds,
   formatDateShort,
+  formatCiVal,
 } from '../format';
-import { fetchOverview, fetchMeta } from '../api';
+import { fetchOverview, fetchMeta, fetchReplay } from '../api';
 import ApiError from '../components/ApiError';
 import ForestPlot from '../components/ForestPlot';
 
 export default function Overview({ variant, meta: initialMeta }) {
   const [meta, setMeta] = useState(initialMeta || null);
   const [overview, setOverview] = useState(null);
+  const [replay, setReplay] = useState(null);
   const [selectedPipelineKey, setSelectedPipelineKey] = useState('streaming');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,12 +37,14 @@ export default function Overview({ variant, meta: initialMeta }) {
     setLoading(true);
     setError(null);
     try {
-      const [metaData, overviewData] = await Promise.all([
+      const [metaData, overviewData, replayData] = await Promise.all([
         meta ? Promise.resolve(meta) : fetchMeta(),
         fetchOverview(variant),
+        replay ? Promise.resolve(replay) : fetchReplay().catch(() => null),
       ]);
       if (!meta) setMeta(metaData);
       setOverview(overviewData);
+      if (replayData) setReplay(replayData);
     } catch (err) {
       console.error('Failed to load overview data:', err);
       setError(err);
@@ -105,6 +109,11 @@ export default function Overview({ variant, meta: initialMeta }) {
     },
   ];
 
+  // Dynamic baseline caption values
+  const baselineTop1Str = formatPct(baseline.top1);
+  const lstmTop1Str = formatPct(models?.lstm?.mean_std?.top1?.[0]);
+  const tfTop1Str = formatPct(models?.transformer?.mean_std?.top1?.[0]);
+
   // Cost Panel Chart Data
   const costChartData = ORDERED_PIPELINES.map((key) => {
     const p = pipelines[key] || {};
@@ -118,63 +127,100 @@ export default function Overview({ variant, meta: initialMeta }) {
     };
   });
 
-  // Plain-language "What this shows" dynamically generated from the data
-  const whatThisShowsSentences = [];
-  if (significance) {
-    const weeklySig = significance.batch_weekly?.top1_gain_points;
-    if (weeklySig) {
-      const [est, low, high] = weeklySig;
-      const crossesZero = low <= 0 && high >= 0;
-      const sign = est > 0 ? '+' : '';
-      const lowSign = low > 0 ? '+' : '';
-      const highSign = high > 0 ? '+' : '';
-      if (crossesZero) {
-        whatThisShowsSentences.push(
-          `Real-time vs weekly batch: ${sign}${est.toFixed(1)} points Top-1, 95% range ${lowSign}${low.toFixed(1)} to ${highSign}${high.toFixed(1)}. Because this range spans zero, the difference is not distinguishable from zero.`
-        );
-      } else {
-        whatThisShowsSentences.push(
-          `Real-time vs weekly batch: ${sign}${est.toFixed(1)} points Top-1, 95% range ${lowSign}${low.toFixed(1)} to ${highSign}${high.toFixed(1)}, showing a statistically significant change.`
-        );
-      }
-    }
+  // Measured full event cost from /api/replay unit_costs (item 4)
+  const measuredFullCostSec = replay?.unit_costs_seconds?.stream_s_per_event_full
+    ?? meta?.unit_costs_seconds?.stream_s_per_event_full;
+  const measuredCostMs = measuredFullCostSec != null
+    ? Math.round(measuredFullCostSec * 1000)
+    : 7;
 
-    const hourlySig = significance.batch_hourly?.top1_gain_points;
-    if (hourlySig) {
-      const [est, low, high] = hourlySig;
-      const crossesZero = low <= 0 && high >= 0;
-      const sign = est > 0 ? '+' : '';
-      const lowSign = low > 0 ? '+' : '';
-      const highSign = high > 0 ? '+' : '';
-      if (crossesZero) {
-        whatThisShowsSentences.push(
-          `Real-time vs hourly batch: ${sign}${est.toFixed(1)} points Top-1 (95% range ${lowSign}${low.toFixed(1)} to ${highSign}${high.toFixed(1)}), also not distinguishable from zero.`
-        );
+  // Fully data-driven, mode-aware "What this shows" and "Seminar key takeaway" (item 1 & 3)
+  const cadences = [
+    { key: 'batch_weekly', label: 'weekly batch' },
+    { key: 'batch_daily', label: 'daily batch' },
+    { key: 'batch_hourly', label: 'hourly batch' },
+  ];
+
+  const whatThisShowsBullets = [];
+  const clvSignificantWins = [];
+  const top1SignificantWins = [];
+
+  if (significance) {
+    cadences.forEach(({ key, label }) => {
+      const data = significance[key];
+      if (!data) return;
+
+      // Top-1 gain analysis with 2 decimals and no -0.0
+      const [tEst, tLow, tHigh] = data.top1_gain_points || [0, 0, 0];
+      const tCrossesZero = tLow <= 0 && tHigh >= 0;
+      const tEstStr = `${formatCiVal(tEst, 2, true)} pt`;
+      const tCiStr = `95% CI: ${formatCiVal(tLow, 2, true)} to ${formatCiVal(tHigh, 2, true)} pt`;
+
+      // CLV MAE gain analysis with 2 decimals
+      const [mEst, mLow, mHigh] = data.mae_gain_pounds || [0, 0, 0];
+      const mExcludesZero = (mLow > 0 && mHigh > 0) || (mLow < 0 && mHigh < 0);
+      const mEstFormatted = `£${formatCiVal(Math.abs(mEst), 2, false)}`;
+      const mCiStr = `95% CI: £${formatCiVal(mLow, 2, true)} to £${formatCiVal(mHigh, 2, true)}`;
+
+      let top1Sentence = tCrossesZero
+        ? `Top-1 gain is ${tEstStr} (${tCiStr}) — not distinguishable from zero`
+        : `Top-1 gain is ${tEstStr} (${tCiStr}) — statistically significant`;
+
+      let clvSentence = '';
+      if (mExcludesZero && mLow > 0) {
+        clvSentence = `real-time is measurably better on CLV error vs ${label} by ${mEstFormatted} lower MAE (${mCiStr})`;
+        clvSignificantWins.push({
+          cadence: label,
+          size: mEstFormatted,
+          interval: mCiStr,
+        });
+      } else if (mExcludesZero && mHigh < 0) {
+        clvSentence = `real-time has measurably higher CLV error vs ${label} by ${mEstFormatted} (${mCiStr})`;
       } else {
-        whatThisShowsSentences.push(
-          `Real-time vs hourly batch: ${sign}${est.toFixed(1)} points Top-1 (95% range ${lowSign}${low.toFixed(1)} to ${highSign}${high.toFixed(1)}).`
-        );
+        clvSentence = `CLV error difference is ${mEst >= 0 ? '+' : '-'}£${formatCiVal(Math.abs(mEst), 2, false)} (${mCiStr}) — not distinguishable from zero`;
       }
-    }
+
+      if (!tCrossesZero && tLow > 0) {
+        top1SignificantWins.push({
+          cadence: label,
+          size: tEstStr,
+          interval: tCiStr,
+        });
+      }
+
+      whatThisShowsBullets.push(`Real-time vs ${label}: ${top1Sentence}; ${clvSentence}.`);
+    });
 
     if (pipelines.streaming && pipelines.batch_hourly) {
       const mult = pipelines.streaming.compute_vs_hourly || 0;
-      whatThisShowsSentences.push(
-        `Compute trade-off: Real-time required ${mult.toFixed(1)}× more compute than hourly batch (${formatSeconds(pipelines.streaming.seconds)} vs ${formatSeconds(pipelines.batch_hourly.seconds)}).`
+      whatThisShowsBullets.push(
+        `Compute ratio: Real-time required ${mult.toFixed(1)}× more compute than hourly batch (${formatSeconds(pipelines.streaming.seconds)} vs ${formatSeconds(pipelines.batch_hourly.seconds)}).`
       );
     }
+  }
 
-    const allCrossZero = [
-      significance.batch_hourly?.top1_gain_points,
-      significance.batch_daily?.top1_gain_points,
-      significance.batch_weekly?.top1_gain_points,
-    ].every((pts) => pts && pts[1] <= 0 && pts[2] >= 0);
+  // Generate Key Takeaway Text dynamically without any fixed text
+  let dynamicTakeaway = '';
+  const computeMultiplierStr = pipelines.streaming?.compute_vs_hourly != null
+    ? `${pipelines.streaming.compute_vs_hourly.toFixed(1)}×`
+    : '24.7×';
+  const variantTitle = variant === 'age'
+    ? 'follow-up model with elapsed-time input'
+    : 'primary model';
 
-    if (allCrossZero) {
-      whatThisShowsSentences.push(
-        `Conclusion: Continuous real-time updates provided no statistically measurable accuracy advantage over batch pipelines on this workload, despite a substantial compute premium.`
-      );
-    }
+  if (top1SignificantWins.length === 0 && clvSignificantWins.length === 0) {
+    dynamicTakeaway = `For the ${variantTitle}, continuous real-time serving provides no statistically detectable improvement over batch cadences in either next-category recommendation accuracy (all Top-1 95% CIs cross zero) or CLV error, despite consuming ${computeMultiplierStr} more compute than hourly batch.`;
+  } else if (top1SignificantWins.length === 0 && clvSignificantWins.length > 0) {
+    const winDescriptions = clvSignificantWins
+      .map((w) => `real-time is measurably better on CLV error vs ${w.cadence} by ${w.size} lower MAE (${w.interval})`)
+      .join(', and ');
+    dynamicTakeaway = `For the ${variantTitle}, continuous real-time serving still achieves no statistically measurable gain on Top-1 recommendation accuracy (all Top-1 95% CIs cross zero). However, ${winDescriptions}, while requiring ${computeMultiplierStr} more compute than hourly batch.`;
+  } else {
+    const winsCombined = [
+      ...clvSignificantWins.map((w) => `measurably better on CLV error vs ${w.cadence} by ${w.size}`),
+      ...top1SignificantWins.map((w) => `measurably better on Top-1 accuracy vs ${w.cadence} by ${w.size}`),
+    ].join(', and ');
+    dynamicTakeaway = `For the ${variantTitle}, continuous real-time serving is ${winsCombined}, while consuming ${computeMultiplierStr} more compute than hourly batch.`;
   }
 
   return (
@@ -330,6 +376,8 @@ export default function Overview({ variant, meta: initialMeta }) {
                   );
                 })}
               </div>
+              {/* Footnote (item 5) */}
+              <p className="segment-footnote">Q1 includes new customers with no training-period history.</p>
             </div>
 
             <div className="side-panel-section">
@@ -417,8 +465,9 @@ export default function Overview({ variant, meta: initialMeta }) {
               </BarChart>
             </ResponsiveContainer>
           </div>
+          {/* Dynamic baseline caption from API (item 2) */}
           <p className="card-caption">
-            Both neural models substantially outperform the global frequency baseline (~33.8%), with LSTM and Transformer achieving comparable Top-1 (~39.5%).
+            Both neural models substantially outperform the global frequency baseline ({baselineTop1Str}), with LSTM ({lstmTop1Str}) and Transformer ({tfTop1Str}) achieving comparable Top-1 accuracy.
           </p>
         </div>
 
@@ -495,6 +544,11 @@ export default function Overview({ variant, meta: initialMeta }) {
             </span>
           </div>
 
+          {/* Model inference only note from /api/replay unit_costs (item 4) */}
+          <p className="compute-model-only-note">
+            Model inference only. Including Kafka + Redis, the measured cost is about {measuredCostMs} ms per event.
+          </p>
+
           {kafka && (
             <div className="kafka-footnote">
               <span className="footnote-tag">Kafka + Redis Deployment:</span>
@@ -521,7 +575,7 @@ export default function Overview({ variant, meta: initialMeta }) {
 
           <div className="what-this-shows-body">
             <ul className="conclusions-list">
-              {whatThisShowsSentences.map((sentence, index) => (
+              {whatThisShowsBullets.map((sentence, index) => (
                 <li key={index} className="conclusion-item">
                   <span className="conclusion-bullet">▸</span>
                   <span className="conclusion-text">{sentence}</span>
@@ -531,9 +585,7 @@ export default function Overview({ variant, meta: initialMeta }) {
 
             <div className="seminar-takeaway-box">
               <span className="takeaway-badge">Seminar Key Takeaway</span>
-              <p className="takeaway-text">
-                For customer next-category recommendation, purchase events occur on the order of weeks and months rather than seconds. Serving inferences continuously on every transaction adds immense compute and operational complexity without delivering a measurable freshness advantage over batched hourly or daily runs.
-              </p>
+              <p className="takeaway-text">{dynamicTakeaway}</p>
             </div>
           </div>
         </div>

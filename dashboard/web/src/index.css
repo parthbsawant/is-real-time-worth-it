@@ -254,24 +254,24 @@ body {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 20px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .pipeline-cards-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  align-items: stretch;
 }
 
 .pipeline-card {
   background-color: var(--card-bg);
   border: 1.5px solid var(--gold-border);
   border-radius: 10px;
-  padding: 18px 16px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 8px rgba(122, 78, 36, 0.04);
@@ -295,6 +295,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  min-height: 42px;
 }
 
 .pipeline-name-group {
@@ -306,11 +307,13 @@ body {
   font-size: 15px;
   font-weight: 700;
   color: var(--brown-heading);
+  line-height: 1.25;
 }
 
 .pipeline-type-tag {
   font-size: 11px;
   color: var(--text-muted);
+  line-height: 1.2;
 }
 
 .active-badge {
@@ -326,12 +329,14 @@ body {
 .pipeline-metrics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 8px;
+  grid-auto-rows: 48px;
+  gap: 8px 8px;
 }
 
 .metric-cell {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: 2px;
 }
 
@@ -339,17 +344,19 @@ body {
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .metric-value {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .metric-value.primary-acc {
   color: var(--brown-heading);
-  font-size: 20px;
+  font-size: 19px;
 }
 
 .metric-value.staleness-val {
@@ -357,6 +364,7 @@ body {
 }
 
 .pipeline-compute-footer {
+  margin-top: auto;
   border-top: 1px solid rgba(227, 185, 91, 0.25);
   padding-top: 10px;
   display: flex;
@@ -486,6 +494,14 @@ body {
   height: 100%;
   border-radius: 3px;
   transition: width 0.3s ease;
+}
+
+.segment-footnote {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 4px;
+  line-height: 1.35;
 }
 
 .latency-stats-grid {
@@ -707,6 +723,14 @@ body {
 .highlight-text {
   font-size: 13.5px;
   color: var(--brown-heading);
+}
+
+.compute-model-only-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: -4px;
+  line-height: 1.4;
 }
 
 .kafka-footnote {
