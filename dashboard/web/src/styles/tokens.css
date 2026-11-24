@@ -1,0 +1,46 @@
+:root {
+  /* Brand colors */
+  --bg-cream: #FBF6EC;
+  --card-bg: #FFFFFF;
+  --card-bg-subtle: #FAF6EE;
+  --gold-accent: #E3B95B;
+  --gold-border: rgba(227, 185, 91, 0.45);
+  --gold-border-strong: #E3B95B;
+  --brown-heading: #7A4E24;
+  --brown-dark: #5D3314;
+  --brown-subtle: rgba(122, 78, 36, 0.08);
+  --text-main: #1E1E1E;
+  --text-muted: #685D52;
+  --text-light: #8C7E72;
+
+  /* Series colors */
+  --color-batch-hourly: #E5BE65;
+  --color-batch-daily: #C89437;
+  --color-batch-weekly: #966324;
+  --color-realtime: #7A4E24;
+
+  /* Typography scale */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-footnote: 13px;
+  --font-size-small: 14px;
+  --font-size-body: 18px;
+  --font-size-table: 17px;
+  --font-size-section: 28px;
+  --font-size-title: 40px;
+  --font-size-kpi: 48px;
+
+  /* Spacing */
+  --card-padding: 28px;
+  --gap-sm: 16px;
+  --gap-md: 24px;
+  --gap-lg: 32px;
+  --max-content-width: 1280px;
+
+  /* Radius & Shadows */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 2px 8px rgba(122, 78, 36, 0.05);
+  --shadow-md: 0 4px 16px rgba(122, 78, 36, 0.08);
+  --shadow-lg: 0 8px 24px rgba(122, 78, 36, 0.12);
+}

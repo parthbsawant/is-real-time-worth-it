@@ -1,70 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import TopBar from './components/TopBar';
-import Overview from './pages/Overview';
-import Simulation from './pages/Simulation';
-import LiveReplay from './pages/LiveReplay';
-import WhoBenefits from './pages/WhoBenefits';
-import ApiError from './components/ApiError';
-import { fetchMeta } from './api';
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { VariantProvider } from './context/VariantContext';
+import AppShell from './components/AppShell';
+import Home from './pages/Home';
+import Batch from './pages/Batch';
+import RealTime from './pages/RealTime';
+import Simulator from './pages/Simulator';
+import Evidence from './pages/Evidence';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [variant, setVariant] = useState('base');
-  const [meta, setMeta] = useState(null);
-  const [loadingMeta, setLoadingMeta] = useState(true);
-  const [metaError, setMetaError] = useState(null);
-
-  const loadMeta = async () => {
-    setLoadingMeta(true);
-    setMetaError(null);
-    try {
-      const data = await fetchMeta();
-      setMeta(data);
-    } catch (err) {
-      console.error('Failed to load API meta:', err);
-      setMetaError(err);
-    } finally {
-      setLoadingMeta(false);
-    }
-  };
-
-  useEffect(() => {
-    loadMeta();
-  }, []);
-
   return (
-    <div className="dashboard-app">
-      <TopBar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        variant={variant}
-        setVariant={setVariant}
-        variantLabels={meta?.variant_labels}
-      />
-
-      <main className="dashboard-main-content">
-        {metaError && (
-          <div className="page-container">
-            <ApiError error={metaError} onRetry={loadMeta} />
-          </div>
-        )}
-
-        {!metaError && activeTab === 'overview' && (
-          <Overview variant={variant} meta={meta} />
-        )}
-
-        {!metaError && activeTab === 'simulation' && (
-          <Simulation variant={variant} meta={meta} />
-        )}
-
-        {!metaError && activeTab === 'replay' && (
-          <LiveReplay variant={variant} meta={meta} />
-        )}
-
-        {!metaError && activeTab === 'benefits' && (
-          <WhoBenefits variant={variant} meta={meta} />
-        )}
-      </main>
-    </div>
+    <VariantProvider>
+      <HashRouter>
+        <AppShell>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/batch" element={<Batch />} />
+            <Route path="/realtime" element={<RealTime />} />
+            <Route path="/simulator" element={<Simulator />} />
+            <Route path="/evidence" element={<Evidence />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AppShell>
+      </HashRouter>
+    </VariantProvider>
   );
 }
