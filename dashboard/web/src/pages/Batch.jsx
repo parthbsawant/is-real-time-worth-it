@@ -170,7 +170,7 @@ export default function Batch() {
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
               data={chartData}
-              margin={{ top: 28, right: 30, left: 45, bottom: 15 }}
+              margin={{ top: 28, right: 30, left: 65, bottom: 15 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E5EA" vertical={false} />
               <XAxis
@@ -209,7 +209,9 @@ export default function Batch() {
               <Legend
                 verticalAlign="top"
                 align="right"
-                wrapperStyle={{ paddingBottom: '12px', fontSize: '14px', fontWeight: 600 }}
+                iconType="rect"
+                iconSize={10}
+                wrapperStyle={{ paddingBottom: '12px', fontSize: '14px', fontWeight: 600, color: 'var(--text)' }}
               />
               <Bar
                 dataKey="median"

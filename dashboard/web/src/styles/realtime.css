@@ -340,7 +340,7 @@
 .rt-progress-date {
   font-weight: 600;
   color: var(--primary);
-  font-family: monospace;
+  font-family: inherit;
 }
 
 /* Live Counters Grid */

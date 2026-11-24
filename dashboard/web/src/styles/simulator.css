@@ -1,0 +1,702 @@
+/* Simulator Page Styles - Slate & Teal Theme */
+.simulator-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* Tabs Segmented Control */
+.sim-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sim-tabs-control {
+  display: inline-flex;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sim-tab-btn {
+  padding: 8px 22px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted);
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.sim-tab-btn.active {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.sim-tab-btn:hover:not(.active) {
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+/* Tab Content */
+.sim-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* Numbered Step Headers */
+.step-heading {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================================
+   REFRESH INTERVAL TAB
+   ======================================================== */
+
+.interval-control-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.interval-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.interval-big-label {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.interval-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Big 52px Slider */
+.interval-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.interval-slider-track {
+  width: 100%;
+  height: 52px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.interval-slider-input {
+  width: 100%;
+  height: 12px;
+  -webkit-appearance: none;
+  background: var(--border);
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.interval-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid var(--card);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.interval-slider-input::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.interval-slider-input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+/* Snap Buttons Row */
+.interval-snap-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-snap {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-snap:hover {
+  background-color: var(--border);
+  border-color: var(--muted);
+}
+
+.btn-snap.active {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+/* Results Cards Grid */
+.sim-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .sim-results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-result-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sim-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sim-result-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.sim-result-badge {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Difference Strip */
+.sim-diff-strip-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sim-diff-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sim-diff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.diff-chip-neutral {
+  background-color: var(--border);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.diff-chip-highlight {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.diff-chip-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.sim-diff-caption {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Sweep Card */
+.sim-sweep-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sim-sweep-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sim-sweep-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sim-sweep-title {
+  font-size: var(--font-size-section);
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.sim-sweep-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.sim-sweep-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.metric-segmented-control {
+  display: inline-flex;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.metric-segmented-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.metric-segmented-btn.active {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.sweep-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.sweep-progress-bar-track {
+  width: 140px;
+  height: 6px;
+  background-color: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sweep-progress-bar-fill {
+  height: 100%;
+  background-color: var(--realtime);
+  transition: width 0.15s ease;
+}
+
+.sweep-chart-wrapper {
+  width: 100%;
+  height: 320px;
+  margin-top: 8px;
+}
+
+.sweep-chart-note {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: -6px;
+}
+
+/* ========================================================
+   CUSTOMER TAB
+   ======================================================== */
+
+.customer-step-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Step 1 Customer Search & Chips */
+.customer-search-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.customer-search-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.customer-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  color: var(--text);
+  width: 100%;
+}
+
+.customer-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.customer-chip-btn {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.customer-chip-btn:hover {
+  background-color: var(--border);
+}
+
+.customer-chip-btn.active {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.customer-summary-pill {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--realtime);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Step 2 Timeline */
+.timeline-strip-container {
+  width: 100%;
+  height: 84px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: visible;
+}
+
+.timeline-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.timeline-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+}
+
+.timeline-slider-group {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-slider-input {
+  width: 100%;
+  height: 8px;
+  -webkit-appearance: none;
+  background: var(--border);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.timeline-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--primary);
+  cursor: pointer;
+}
+
+.timeline-nav-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-nav-purchase {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-nav-purchase:hover:not(:disabled) {
+  background-color: var(--border);
+}
+
+.btn-nav-purchase:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cadence-select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Step 3 Comparison Columns */
+.compare-columns-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .compare-columns-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-column-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compare-column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-col-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compare-col-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.compare-col-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Horizontal Probability Bars */
+.prob-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prob-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prob-bar-label-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+}
+
+.prob-bar-cat {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.prob-bar-pct {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.prob-bar-track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.prob-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.predicted-spend-line {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+/* Missed Purchases Banner */
+.missed-purchases-banner {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.missed-banner-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.missed-purchases-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.missed-purchase-chip {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Actual Next Purchase Line */
+.actual-next-purchase-card {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.4;
+}

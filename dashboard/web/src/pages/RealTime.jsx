@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Play, Pause, RotateCcw, Check, X, Minus, Info } from 'lucide-react';
 import { useVariant } from '../context/VariantContext';
 import { useApi } from '../hooks/useApi';
 import PageHeader from '../components/PageHeader';
 import ApiError from '../components/ApiError';
 import Tooltip from '../components/Tooltip';
-import { formatGbp, formatPct, formatStaleness, formatSeconds } from '../lib/format';
+import { formatGbp, formatPct, formatStaleness } from '../lib/format';
 import '../styles/realtime.css';
 
 function binaryInsert(arr, val) {
@@ -32,7 +32,7 @@ export default function RealTime() {
     `/api/overview?variant=${variant}`
   );
   const { data: meta, error: metaError, refetch: refetchMeta } = useApi('/api/meta');
-  const { data: replayData, loading: replayLoading, error: replayError, refetch: refetchReplay } = useApi(
+  const { data: replayData, error: replayError, refetch: refetchReplay } = useApi(
     '/api/replay'
   );
 
@@ -522,7 +522,7 @@ export default function RealTime() {
 
         {/* Footnote */}
         <p className="rt-footnote">
-          Live Top-1 is measured on replayed events that have a later purchase ({kafkaCheck.events_with_a_later_purchase || 2649}); the final value should be about {formatPct(kafkaCheck.live_top1 || 0.332)}. The Top-1 above comes from the {meta?.dataset?.examples?.test || 2828} test examples, a different set, so the two numbers differ.
+          Live Top-1 is measured on replayed events that have a later purchase ({kafkaCheck.events_with_a_later_purchase ? Number(kafkaCheck.events_with_a_later_purchase).toLocaleString() : '2,649'}); the final value should be about {formatPct(kafkaCheck.live_top1 || 0.332)}. The Top-1 above comes from the {meta?.dataset?.examples?.test ? Number(meta.dataset.examples.test).toLocaleString() : '2,828'} test examples, a different set, so the two numbers differ.
         </p>
       </section>
 
