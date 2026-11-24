@@ -125,7 +125,8 @@ def _interval(variant: str, hours: float):
     r["top1_by_segment"] = {int(k): float((scores[seg_of == k].argmax(1) == s.z["y_cat"][seg_of == k]).mean()) for k in (1, 2, 3, 4)}
     if step is None:
         r.update(staleness_hours_median=0.0, staleness_hours_p95=0.0, inferences=len(s.events),
-                 est_cpu_seconds=len(s.events) * s.unit["stream_s_per_event_full"])
+                 est_cpu_seconds=len(s.events) * s.unit["stream_s_per_event_model_only"],
+                 est_cpu_seconds_full=len(s.events) * s.unit["stream_s_per_event_full"])
     else:
         d = np.array([tick_ceil(t, s.origin, step) - t for _, t in s.events]) / HOUR
         pairs = {(c, tick_ceil(t, s.origin, step)) for c, t in s.events}
@@ -291,7 +292,13 @@ def hybrid(top_pct: float = Query(25, ge=0, le=100), batch: str = "batch_daily",
     cpu = sum(ev.get(c, 0) for c in rt) * u["stream_s_per_event_full"] + sum(v for c, v in pairs.items() if c not in rt) * u["batch_s_per_inference"]
     all_rt = len(s.events) * u["stream_s_per_event_full"]
     all_batch = sum(pairs.values()) * u["batch_s_per_inference"]
+    # model-inference-only view (same basis as the Overview page); the figures above include Kafka + Redis overhead
+    ev_rt = sum(ev.get(c, 0) for c in rt)
+    cpu_m = ev_rt * u["stream_s_per_event_model_only"] + sum(v for c, v in pairs.items() if c not in rt) * u["batch_s_per_inference"]
+    all_rt_m = len(s.events) * u["stream_s_per_event_model_only"]
     return {"top_pct": top_pct, "customers_realtime": n_rt, "batch": batch, "variant": variant,
             "top1": res["top1"], "top3": res["top3"], "f1": res["f1"], "clv_mae": res["clv_mae"],
             "est_cpu_seconds": cpu, "all_realtime_cpu_seconds": all_rt, "all_batch_cpu_seconds": all_batch,
-            "share_of_examples_served_realtime": float(use_rt.mean())}
+            "share_of_examples_served_realtime": float(use_rt.mean()),
+            "share_of_events_served_realtime": ev_rt / max(len(s.events), 1),
+            "est_cpu_seconds_model_only": cpu_m, "all_realtime_cpu_seconds_model_only": all_rt_m}

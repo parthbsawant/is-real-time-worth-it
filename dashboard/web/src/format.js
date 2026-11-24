@@ -44,6 +44,17 @@ export function formatCiVal(val, decimals = 2, showSign = true) {
   return `${sign}${num.toFixed(decimals)}`;
 }
 
+/**
+ * Format currency with explicit sign (-£41.07 or +£42.23)
+ */
+export function formatCurrencySigned(val, decimals = 2) {
+  if (val == null || isNaN(val)) return '—';
+  let num = Number(Number(val).toFixed(decimals));
+  if (Object.is(num, -0) || Math.abs(num) < 1e-12) num = 0;
+  const sign = num < 0 ? '-' : '+';
+  return `${sign}£${Math.abs(num).toFixed(decimals)}`;
+}
+
 export function formatInterval(low, high, decimals = 2, prefix = '', suffix = '') {
   if (low == null || high == null) return '—';
   const formattedLow = formatCiVal(low, decimals, true);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatCiVal } from '../format';
+import { formatCiVal, formatCurrencySigned } from '../format';
 
 export default function ForestPlot({ significance }) {
   const [metric, setMetric] = useState('top1'); // 'top1' or 'mae'
@@ -61,7 +61,7 @@ export default function ForestPlot({ significance }) {
         <div className="forest-plot-title-group">
           <h3 className="card-title">Is the difference real?</h3>
           <span className="card-subtitle">
-            95% bootstrap confidence intervals for Real-Time gain over batch (2 decimals)
+            95% bootstrap confidence intervals for Real-Time gain over batch
           </span>
         </div>
         <div className="metric-toggle-group">
@@ -104,9 +104,9 @@ export default function ForestPlot({ significance }) {
             fill="rgba(122, 78, 36, 0.06)"
           />
 
-          {/* Directional labels at top */}
+          {/* Directional labels at top - anchored to opposite ends so they never overlap */}
           <text
-            x={plotLeft + 8}
+            x={plotLeft}
             y="18"
             className="forest-guide-text batch-better"
             textAnchor="start"
@@ -114,10 +114,10 @@ export default function ForestPlot({ significance }) {
             ← Batch better
           </text>
           <text
-            x={zeroX + 8}
+            x={plotRight}
             y="18"
             className="forest-guide-text realtime-better"
-            textAnchor="start"
+            textAnchor="end"
           >
             Real-time better →
           </text>
@@ -146,11 +146,12 @@ export default function ForestPlot({ significance }) {
             const strokeColor = isGrey ? '#8C8C8C' : '#7A4E24';
             const fillColor = isGrey ? '#8C8C8C' : '#7A4E24';
 
-            const unit = metric === 'top1' ? 'pt' : '£';
             const formattedEst = metric === 'top1'
               ? `${formatCiVal(row.estimate, 2, true)} pt`
-              : `${formatCiVal(row.estimate, 2, true)} £`;
-            const formattedCi = `[${formatCiVal(row.ciLow, 2, true)}, ${formatCiVal(row.ciHigh, 2, true)}]`;
+              : formatCurrencySigned(row.estimate, 2);
+            const formattedCi = metric === 'top1'
+              ? `[${formatCiVal(row.ciLow, 2, true)}, ${formatCiVal(row.ciHigh, 2, true)}]`
+              : `[${formatCurrencySigned(row.ciLow, 2)}, ${formatCurrencySigned(row.ciHigh, 2)}]`;
 
             return (
               <g key={row.key} className={`forest-row ${isGrey ? 'greyed' : 'significant'}`}>

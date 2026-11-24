@@ -20,6 +20,7 @@ import {
   formatSeconds,
   formatDateShort,
   formatCiVal,
+  formatCurrencySigned,
 } from '../format';
 import { fetchOverview, fetchMeta, fetchReplay } from '../api';
 import ApiError from '../components/ApiError';
@@ -87,7 +88,7 @@ export default function Overview({ variant, meta: initialMeta }) {
   const selectedPipeline = pipelines[selectedPipelineKey] || pipelines['streaming'] || {};
   const selectedMeta = PIPELINE_META[selectedPipelineKey] || PIPELINE_META['streaming'];
 
-  // Baseline Comparison Chart Data
+  // Baseline Comparison Chart Data - labeled "Transformer" (item 5)
   const baselineChartData = [
     {
       name: 'Baseline (Global Prior)',
@@ -102,7 +103,7 @@ export default function Overview({ variant, meta: initialMeta }) {
       fill: '#966324',
     },
     {
-      name: 'Transformer (Primary)',
+      name: 'Transformer',
       top1: Number(((models?.transformer?.mean_std?.top1?.[0] || 0) * 100).toFixed(1)),
       std: Number(((models?.transformer?.mean_std?.top1?.[1] || 0) * 100).toFixed(2)),
       fill: '#7A4E24',
@@ -134,7 +135,7 @@ export default function Overview({ variant, meta: initialMeta }) {
     ? Math.round(measuredFullCostSec * 1000)
     : 7;
 
-  // Fully data-driven, mode-aware "What this shows" and "Seminar key takeaway" (item 1 & 3)
+  // Fully data-driven, mode-aware "What this shows" and "Seminar key takeaway"
   const cadences = [
     { key: 'batch_weekly', label: 'weekly batch' },
     { key: 'batch_daily', label: 'daily batch' },
@@ -156,11 +157,11 @@ export default function Overview({ variant, meta: initialMeta }) {
       const tEstStr = `${formatCiVal(tEst, 2, true)} pt`;
       const tCiStr = `95% CI: ${formatCiVal(tLow, 2, true)} to ${formatCiVal(tHigh, 2, true)} pt`;
 
-      // CLV MAE gain analysis with 2 decimals
+      // CLV MAE gain analysis with signed currency formatting (e.g. -£41.07 and +£42.23)
       const [mEst, mLow, mHigh] = data.mae_gain_pounds || [0, 0, 0];
       const mExcludesZero = (mLow > 0 && mHigh > 0) || (mLow < 0 && mHigh < 0);
-      const mEstFormatted = `£${formatCiVal(Math.abs(mEst), 2, false)}`;
-      const mCiStr = `95% CI: £${formatCiVal(mLow, 2, true)} to £${formatCiVal(mHigh, 2, true)}`;
+      const mEstAbs = Math.abs(mEst).toFixed(2);
+      const mIntervalStr = `95% CI ${formatCurrencySigned(mLow)} to ${formatCurrencySigned(mHigh)}`;
 
       let top1Sentence = tCrossesZero
         ? `Top-1 gain is ${tEstStr} (${tCiStr}) — not distinguishable from zero`
@@ -168,16 +169,18 @@ export default function Overview({ variant, meta: initialMeta }) {
 
       let clvSentence = '';
       if (mExcludesZero && mLow > 0) {
-        clvSentence = `real-time is measurably better on CLV error vs ${label} by ${mEstFormatted} lower MAE (${mCiStr})`;
+        clvSentence = `real-time is measurably better on CLV error vs ${label} by £${mEstAbs} lower MAE (${mIntervalStr})`;
         clvSignificantWins.push({
           cadence: label,
-          size: mEstFormatted,
-          interval: mCiStr,
+          size: `£${mEstAbs}`,
+          interval: mIntervalStr,
         });
       } else if (mExcludesZero && mHigh < 0) {
-        clvSentence = `real-time has measurably higher CLV error vs ${label} by ${mEstFormatted} (${mCiStr})`;
+        clvSentence = `real-time has measurably higher CLV error vs ${label} by £${mEstAbs} (${mIntervalStr})`;
       } else {
-        clvSentence = `CLV error difference is ${mEst >= 0 ? '+' : '-'}£${formatCiVal(Math.abs(mEst), 2, false)} (${mCiStr}) — not distinguishable from zero`;
+        // Polish item (4): For non-significant CLV results, write “real-time MAE is £X higher/lower (95% CI …)”
+        const higherLower = mEst >= 0 ? 'lower' : 'higher';
+        clvSentence = `real-time MAE is £${mEstAbs} ${higherLower} (${mIntervalStr}) — not distinguishable from zero`;
       }
 
       if (!tCrossesZero && tLow > 0) {
@@ -257,100 +260,102 @@ export default function Overview({ variant, meta: initialMeta }) {
         </div>
       </section>
 
-      {/* 2. Pipeline Cards & Side Panel */}
+      {/* 2. Pipeline Cards & Detail Panel in a row beneath (Polish item 1) */}
       <section className="pipelines-section">
         <div className="section-header">
           <h2 className="section-title">Pipeline Comparison</h2>
           <span className="section-subtitle">
-            Measured accuracy, staleness, and compute cost across 4 serving architectures. Click a card to inspect.
+            Measured accuracy, staleness, and compute cost across 4 serving architectures. Click a card to inspect its details below.
           </span>
         </div>
 
-        <div className="pipelines-grid-with-sidebar">
-          <div className="pipeline-cards-row">
-            {ORDERED_PIPELINES.map((key) => {
-              const p = pipelines[key] || {};
-              const metaInfo = PIPELINE_META[key] || {};
-              const isSelected = selectedPipelineKey === key;
-              return (
-                <div
-                  key={key}
-                  className={`pipeline-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => setSelectedPipelineKey(key)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      setSelectedPipelineKey(key);
-                    }
-                  }}
-                  style={{
-                    borderColor: isSelected ? metaInfo.color : 'rgba(227, 185, 91, 0.4)',
-                  }}
-                >
-                  <div className="card-top-header" style={{ borderLeftColor: metaInfo.color }}>
-                    <div className="pipeline-name-group">
-                      <span className="pipeline-title">{metaInfo.label}</span>
-                      <span className="pipeline-type-tag">{metaInfo.type === 'realtime' ? 'Continuous' : 'Periodic'}</span>
-                    </div>
-                    {isSelected && <span className="active-badge">Active</span>}
+        {/* 4 Equal-height pipeline cards spanning full width */}
+        <div className="pipeline-cards-row">
+          {ORDERED_PIPELINES.map((key) => {
+            const p = pipelines[key] || {};
+            const metaInfo = PIPELINE_META[key] || {};
+            const isSelected = selectedPipelineKey === key;
+            return (
+              <div
+                key={key}
+                className={`pipeline-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => setSelectedPipelineKey(key)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedPipelineKey(key);
+                  }
+                }}
+                style={{
+                  borderColor: isSelected ? metaInfo.color : 'rgba(227, 185, 91, 0.4)',
+                }}
+              >
+                <div className="card-top-header" style={{ borderLeftColor: metaInfo.color }}>
+                  <div className="pipeline-name-group">
+                    <span className="pipeline-title">{metaInfo.label}</span>
+                    <span className="pipeline-type-tag">{metaInfo.type === 'realtime' ? 'Continuous' : 'Periodic'}</span>
                   </div>
+                  {isSelected && <span className="active-badge">Selected</span>}
+                </div>
 
-                  <div className="pipeline-metrics-grid">
-                    <div className="metric-cell">
-                      <span className="metric-label">Top-1 Accuracy</span>
-                      <strong className="metric-value primary-acc">{formatPct(p.top1)}</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span className="metric-label">Top-3 Accuracy</span>
-                      <strong className="metric-value">{formatPct(p.top3)}</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span className="metric-label">CLV Error (MAE)</span>
-                      <strong className="metric-value">{formatGbp(p.clv_mae)}</strong>
-                    </div>
-                    <div className="metric-cell">
-                      <span className="metric-label">Median Staleness</span>
-                      <strong className="metric-value staleness-val">
-                        {formatStaleness(p.staleness_hours_median, kafka)}
-                      </strong>
-                    </div>
+                <div className="pipeline-metrics-grid">
+                  <div className="metric-cell">
+                    <span className="metric-label">Top-1 Accuracy</span>
+                    <strong className="metric-value primary-acc">{formatPct(p.top1)}</strong>
                   </div>
-
-                  <div className="pipeline-compute-footer">
-                    <div className="compute-stat">
-                      <span className="compute-label">Inferences:</span>
-                      <span className="compute-val">{formatNumber(p.inferences)}</span>
-                    </div>
-                    <div className="compute-stat">
-                      <span className="compute-label">CPU:</span>
-                      <span className="compute-val">{formatSeconds(p.seconds)}</span>
-                    </div>
-                    <div className="compute-stat">
-                      <span className="compute-label">Cost vs 1h:</span>
-                      <span className="compute-val multiplier">
-                        {p.compute_vs_hourly != null ? `${p.compute_vs_hourly.toFixed(1)}×` : '1.0×'}
-                      </span>
-                    </div>
+                  <div className="metric-cell">
+                    <span className="metric-label">Top-3 Accuracy</span>
+                    <strong className="metric-value">{formatPct(p.top3)}</strong>
+                  </div>
+                  <div className="metric-cell">
+                    <span className="metric-label">CLV Error (MAE)</span>
+                    <strong className="metric-value">{formatGbp(p.clv_mae)}</strong>
+                  </div>
+                  <div className="metric-cell">
+                    <span className="metric-label">Median Staleness</span>
+                    <strong className="metric-value staleness-val">
+                      {formatStaleness(p.staleness_hours_median, kafka)}
+                    </strong>
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="pipeline-compute-footer">
+                  <div className="compute-stat">
+                    <span className="compute-label">Inferences:</span>
+                    <span className="compute-val">{formatNumber(p.inferences)}</span>
+                  </div>
+                  <div className="compute-stat">
+                    <span className="compute-label">CPU:</span>
+                    <span className="compute-val">{formatSeconds(p.seconds)}</span>
+                  </div>
+                  <div className="compute-stat">
+                    <span className="compute-label">Cost vs 1h:</span>
+                    <span className="compute-val multiplier">
+                      {p.compute_vs_hourly != null ? `${p.compute_vs_hourly.toFixed(1)}×` : '1.0×'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Selected Pipeline Detail Panel directly beneath the cards (Polish item 1) */}
+        <div className="pipeline-detail-banner">
+          <div className="detail-banner-header" style={{ borderLeftColor: selectedMeta.color }}>
+            <div className="detail-banner-title-group">
+              <span className="detail-banner-eyebrow">Inspecting Selected Pipeline</span>
+              <h3 className="detail-banner-title">{selectedMeta.label}</h3>
+            </div>
+            <span className="detail-banner-badge" style={{ backgroundColor: selectedMeta.color }}>
+              {selectedMeta.shortLabel}
+            </span>
           </div>
 
-          {/* Side Panel for Clicked Pipeline */}
-          <aside className="pipeline-side-panel">
-            <div className="side-panel-header" style={{ borderLeftColor: selectedMeta.color }}>
-              <div className="side-panel-title-wrapper">
-                <span className="side-panel-eyebrow">Detailed Breakdown</span>
-                <h3 className="side-panel-title">{selectedMeta.label}</h3>
-              </div>
-              <span className="side-panel-badge" style={{ backgroundColor: selectedMeta.color }}>
-                {selectedMeta.shortLabel}
-              </span>
-            </div>
-
-            <div className="side-panel-section">
+          <div className="detail-banner-content-grid">
+            {/* Per-segment breakdown */}
+            <div className="detail-banner-block">
               <h4 className="side-section-heading">Per-Segment Top-1 Accuracy</h4>
               <p className="side-section-desc">By customer purchase-frequency quartile:</p>
               <div className="segment-breakdown-list">
@@ -376,12 +381,13 @@ export default function Overview({ variant, meta: initialMeta }) {
                   );
                 })}
               </div>
-              {/* Footnote (item 5) */}
               <p className="segment-footnote">Q1 includes new customers with no training-period history.</p>
             </div>
 
-            <div className="side-panel-section">
-              <h4 className="side-section-heading">Latency & Reliability</h4>
+            {/* Latency and Reliability metrics */}
+            <div className="detail-banner-block">
+              <h4 className="side-section-heading">Latency & Reliability Profile</h4>
+              <p className="side-section-desc">Performance measurements in live deployment:</p>
               <div className="latency-stats-grid">
                 <div className="latency-stat-box">
                   <span className="latency-label">Median Latency</span>
@@ -401,13 +407,13 @@ export default function Overview({ variant, meta: initialMeta }) {
                 </div>
               </div>
             </div>
-          </aside>
+          </div>
         </div>
       </section>
 
       {/* 3. Baseline comparison & Significance */}
       <div className="grid-two-cols">
-        {/* Baseline Comparison Bar Chart */}
+        {/* Baseline Comparison Bar Chart - with generous left margin so y-axis title is never clipped (Polish item 3) */}
         <div className="card-box">
           <div className="card-box-header">
             <div>
@@ -422,7 +428,7 @@ export default function Overview({ variant, meta: initialMeta }) {
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
                 data={baselineChartData}
-                margin={{ top: 25, right: 25, left: 10, bottom: 25 }}
+                margin={{ top: 25, right: 25, left: 35, bottom: 25 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(122, 78, 36, 0.12)" vertical={false} />
                 <XAxis
@@ -431,6 +437,7 @@ export default function Overview({ variant, meta: initialMeta }) {
                   interval={0}
                 />
                 <YAxis
+                  width={45}
                   domain={[0, 48]}
                   unit="%"
                   tick={{ fill: '#1E1E1E', fontSize: 12 }}
@@ -438,7 +445,7 @@ export default function Overview({ variant, meta: initialMeta }) {
                     value: 'Top-1 Accuracy (%)',
                     angle: -90,
                     position: 'insideLeft',
-                    offset: 12,
+                    offset: 10,
                     fill: '#7A4E24',
                     fontSize: 13,
                     fontWeight: 600,
@@ -465,7 +472,7 @@ export default function Overview({ variant, meta: initialMeta }) {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          {/* Dynamic baseline caption from API (item 2) */}
+          {/* Dynamic baseline caption from API */}
           <p className="card-caption">
             Both neural models substantially outperform the global frequency baseline ({baselineTop1Str}), with LSTM ({lstmTop1Str}) and Transformer ({tfTop1Str}) achieving comparable Top-1 accuracy.
           </p>
@@ -477,7 +484,7 @@ export default function Overview({ variant, meta: initialMeta }) {
 
       {/* 4. Cost Panel & Plain Language "What this shows" */}
       <div className="grid-two-cols">
-        {/* Cost Panel */}
+        {/* Cost Panel - with generous left margin so y-axis title is never clipped (Polish item 3) */}
         <div className="card-box">
           <div className="card-box-header">
             <div>
@@ -490,20 +497,24 @@ export default function Overview({ variant, meta: initialMeta }) {
 
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={costChartData} margin={{ top: 20, right: 25, left: 10, bottom: 25 }}>
+              <BarChart
+                data={costChartData}
+                margin={{ top: 20, right: 25, left: 35, bottom: 25 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(122, 78, 36, 0.12)" vertical={false} />
                 <XAxis
                   dataKey="name"
                   tick={{ fill: '#1E1E1E', fontSize: 13, fontWeight: 500 }}
                 />
                 <YAxis
+                  width={45}
                   unit="s"
                   tick={{ fill: '#1E1E1E', fontSize: 12 }}
                   label={{
                     value: 'CPU Seconds (s)',
                     angle: -90,
                     position: 'insideLeft',
-                    offset: 12,
+                    offset: 10,
                     fill: '#7A4E24',
                     fontSize: 13,
                     fontWeight: 600,
@@ -544,7 +555,7 @@ export default function Overview({ variant, meta: initialMeta }) {
             </span>
           </div>
 
-          {/* Model inference only note from /api/replay unit_costs (item 4) */}
+          {/* Model inference only note from /api/replay unit_costs */}
           <p className="compute-model-only-note">
             Model inference only. Including Kafka + Redis, the measured cost is about {measuredCostMs} ms per event.
           </p>
