@@ -16,7 +16,7 @@ import { useApi } from '../hooks/useApi';
 import PageHeader from '../components/PageHeader';
 import PipelineCard from '../components/PipelineCard';
 import ApiError from '../components/ApiError';
-import { THEME } from '../constants';
+import { THEME } from '../lib/constants';
 import { formatStaleness } from '../lib/format';
 import '../styles/batch.css';
 

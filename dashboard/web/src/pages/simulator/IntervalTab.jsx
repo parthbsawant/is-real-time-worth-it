@@ -15,7 +15,7 @@ import { fetchInterval } from '../../api';
 import KpiTile from '../../components/KpiTile';
 import Accordion from '../../components/Accordion';
 import { formatPct, formatGbp, formatNumber, formatStaleness, formatCiVal, formatCurrencySigned } from '../../lib/format';
-import { THEME } from '../../constants';
+import { THEME } from '../../lib/constants';
 
 const MIN_HOURS = 0.25;
 const MAX_HOURS = 336;
@@ -226,6 +226,7 @@ export default function IntervalTab({ variant = 'base' }) {
               tooltipTerm="Model compute"
               label="Model compute"
               value={batch.est_cpu_seconds != null ? `${batch.est_cpu_seconds.toFixed(2)} s` : '—'}
+              caption="Estimated from the measured cost per model run. The Batch and Real-Time pages show the measured totals."
             />
           </div>
 
@@ -283,6 +284,7 @@ export default function IntervalTab({ variant = 'base' }) {
               tooltipTerm="Model compute"
               label="Model compute"
               value={rt.est_cpu_seconds != null ? `${rt.est_cpu_seconds.toFixed(2)} s` : '—'}
+              caption="Estimated from the measured cost per model run. The Batch and Real-Time pages show the measured totals."
             />
           </div>
 

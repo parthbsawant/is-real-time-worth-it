@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, ChevronLeft, ChevronRight, Check, X, Award, AlertCircle, Info } from 'lucide-react';
 import { fetchCustomers, fetchCustomer, fetchCustomerAt } from '../../api';
 import { formatGbp, formatPct } from '../../lib/format';
-import { THEME } from '../../constants';
+import { THEME } from '../../lib/constants';
 
 export default function CustomerTab({ variant = 'base', meta = null }) {
   const [suggestionCustomers, setSuggestionCustomers] = useState([]);
