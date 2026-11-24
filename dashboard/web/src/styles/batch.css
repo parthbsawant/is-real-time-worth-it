@@ -1,0 +1,239 @@
+/* Batch Processing Page Styles - Slate & Teal Theme */
+.batch-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* 1. Flow Strip */
+.flow-strip-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .flow-strip-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .flow-arrow {
+    transform: rotate(90deg);
+    margin: 4px auto;
+  }
+}
+
+.flow-box {
+  flex: 1;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.flow-step-tag {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+
+.flow-step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.3;
+}
+
+.flow-arrow {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 2. Cadence Cards Grid */
+.cadence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .cadence-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pipeline-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pipeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.pipeline-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pipeline-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.pipeline-card-cadence {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.pipeline-kpi-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kpi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.kpi-row:last-child {
+  border-bottom: none;
+}
+
+.kpi-row-label {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.kpi-row-val-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.kpi-row-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.kpi-row-caption {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.kpi-row-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.kpi-row-compact:last-child {
+  border-bottom: none;
+}
+
+.kpi-compact-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.kpi-compact-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* 3. Staleness Chart Section */
+.batch-chart-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.batch-chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.batch-chart-title {
+  font-size: var(--font-size-section);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
+
+.batch-chart-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.batch-chart-wrapper {
+  width: 100%;
+  height: 330px;
+  margin-top: 8px;
+}
+
+/* 4. Conclusion Callout */
+.batch-conclusion-callout {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.batch-conclusion-line-a {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.batch-conclusion-line-b {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.4;
+}

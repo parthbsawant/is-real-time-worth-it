@@ -6,8 +6,8 @@
 
 body {
   font-family: var(--font-family);
-  background-color: var(--bg-cream);
-  color: var(--text-main);
+  background-color: var(--bg);
+  color: var(--text);
   font-size: var(--font-size-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -53,28 +53,28 @@ button {
 .page-title {
   font-size: var(--font-size-title);
   font-weight: 800;
-  color: var(--brown-heading);
+  color: var(--primary);
   letter-spacing: -0.5px;
   line-height: 1.15;
 }
 
 .page-subtitle {
   font-size: 18px;
-  color: var(--text-muted);
+  color: var(--muted);
   line-height: 1.4;
 }
 
 .page-meta-strip {
   font-size: 14px;
-  color: var(--text-light);
+  color: var(--muted);
   margin-top: 4px;
 }
 
 /* Slim Top Bar (64px) */
 .app-topbar {
   height: 64px;
-  background-color: var(--bg-cream);
-  border-bottom: 2px solid var(--gold-border-strong);
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -82,7 +82,7 @@ button {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 6px rgba(122, 78, 36, 0.04);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .topbar-left {
@@ -97,23 +97,23 @@ button {
   gap: 8px;
   font-size: 15px;
   font-weight: 700;
-  color: var(--brown-heading);
+  color: var(--primary);
   padding: 6px 12px;
   border-radius: var(--radius-sm);
-  background-color: rgba(227, 185, 91, 0.15);
-  border: 1px solid var(--gold-border);
+  background-color: var(--bg);
+  border: 1px solid var(--border);
   transition: all 0.15s ease;
 }
 
 .btn-back-dashboard:hover {
-  background-color: rgba(227, 185, 91, 0.3);
+  background-color: var(--border);
   transform: translateX(-2px);
 }
 
 .topbar-app-name {
   font-size: 16px;
   font-weight: 700;
-  color: var(--brown-heading);
+  color: var(--primary);
   letter-spacing: -0.2px;
 }
 
@@ -132,13 +132,13 @@ button {
 .model-toggle-label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--brown-heading);
+  color: var(--muted);
 }
 
 .model-segmented-control {
   display: inline-flex;
-  background-color: rgba(227, 185, 91, 0.2);
-  border: 1px solid var(--gold-border-strong);
+  background-color: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 2px;
 }
@@ -149,22 +149,22 @@ button {
   padding: 6px 14px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--brown-heading);
+  color: var(--muted);
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.15s ease;
 }
 
 .model-segmented-btn.active {
-  background-color: var(--brown-heading);
-  color: #FFFFFF;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* Card Styles */
 .card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--gold-border-strong);
+  background-color: var(--card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--card-padding);
   box-shadow: var(--shadow-sm);
@@ -174,8 +174,8 @@ button {
 .kbd-hint {
   font-size: 11px;
   font-family: monospace;
-  background-color: rgba(122, 78, 36, 0.1);
-  color: var(--brown-heading);
+  background-color: rgba(15, 23, 42, 0.08);
+  color: var(--text);
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 6px;
@@ -188,7 +188,7 @@ button {
   align-items: center;
   gap: 4px;
   cursor: help;
-  border-bottom: 1px dotted var(--brown-heading);
+  border-bottom: 1px dotted var(--muted);
 }
 
 .tooltip-trigger-icon {
@@ -198,8 +198,8 @@ button {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: rgba(122, 78, 36, 0.12);
-  color: var(--brown-heading);
+  background-color: var(--border);
+  color: var(--muted);
   font-size: 11px;
   font-weight: 700;
 }
@@ -207,8 +207,8 @@ button {
 .tooltip-popover {
   position: absolute;
   z-index: 1000;
-  background-color: #1E1E1E;
-  color: #FBF6EC;
+  background-color: var(--primary);
+  color: var(--on-primary);
   font-size: 14px;
   padding: 8px 12px;
   border-radius: 6px;
@@ -220,7 +220,7 @@ button {
 
 /* Accordion Component */
 .accordion-wrapper {
-  border-top: 1px solid var(--gold-border);
+  border-top: 1px solid var(--border);
   padding-top: 12px;
   margin-top: 12px;
 }
@@ -235,24 +235,24 @@ button {
   padding: 6px 2px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--brown-heading);
+  color: var(--primary);
   cursor: pointer;
   border-radius: 4px;
   transition: color 0.15s ease;
 }
 
 .accordion-trigger:hover {
-  color: var(--brown-dark);
+  color: var(--text);
 }
 
 .accordion-trigger:focus-visible {
-  outline: 2px solid var(--gold-accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 .accordion-chevron {
   transition: transform 0.2s ease;
-  color: var(--brown-heading);
+  color: var(--muted);
 }
 
 .accordion-chevron.open {
@@ -265,4 +265,3 @@ button {
   flex-direction: column;
   gap: 8px;
 }
-

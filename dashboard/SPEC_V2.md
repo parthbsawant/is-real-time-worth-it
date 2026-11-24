@@ -10,8 +10,11 @@ Audience: professors watching a live demo on a projector. Goal: each page makes 
 3. Lots of white space: cards have 28px padding, 24-32px gaps, content centred, max width 1280px. No horizontal scroll at 1366 px width.
 4. At most 4 KPI tiles in a row. Secondary numbers (p95, F1, RMSE, inferences) go in a collapsed "More detail" accordion, closed by default.
 5. Text blocks: max 3 lines each. Plain English; every technical word has a "?" tooltip (definitions in section 8).
-6. Keep the cream / gold / brown theme: bg #FBF6EC, card #FFFFFF, gold #E3B95B, brown #7A4E24, text #1E1E1E, muted #685D52.
-   Series colours: hourly #E5BE65, daily #C89437, weekly #966324, real-time #7A4E24. Font: Inter.
+6. Theme "Slate & Teal" (minimal). Define these as CSS variables in `src/styles/tokens.css` and use ONLY the variables everywhere (also in Recharts props via `constants.js`):
+   --bg #F6F7F8 | --card #FFFFFF | --text #111827 | --muted #6B7280 | --primary #0F172A (page titles, conclusion card background) | --on-primary #F6F7F8 | --accent #2DD4BF (labels on dark) | --border #E2E5EA
+   Series: hourly #CBD5E1 | daily #94A3B8 | weekly #64748B | real-time #0D9488 (use #0F766E for small real-time TEXT, it has better contrast) | focus ring #0D9488.
+   Status badges: correct text #166534 on #DCFCE7 | in top-3 #854D0E on #FEF9C3 | wrong #991B1B on #FEE2E2 | neutral/"within noise" #374151 on #E2E5EA.
+   Batch = greys, real-time = teal, everywhere (cards, bars, lines, chips). Font: Inter.
 7. All numbers come from the API. All conclusion/verdict sentences are generated from API data (never typed in), and must work for both variants.
 8. Currency is GBP (£). Percentages 1 decimal. Intervals 2 decimals, never "-0.00" (use the existing `formatCiVal`).
 9. Every page has loading skeletons and a friendly error card (reuse `ApiError`): "Start the API: uvicorn dashboard.api.main:app --port 8000" with a Retry button.

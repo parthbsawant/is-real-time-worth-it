@@ -3,7 +3,7 @@ export const PIPELINE_META = {
     key: 'batch_hourly',
     label: 'Batch Hourly',
     shortLabel: 'Hourly',
-    color: '#E5BE65', // light gold-tan
+    color: '#CBD5E1', // --hourly
     type: 'batch',
     cadence: 'every 1 hour',
     description: 'Predictions recomputed on a schedule every 1 hour.',
@@ -12,7 +12,7 @@ export const PIPELINE_META = {
     key: 'batch_daily',
     label: 'Batch Daily',
     shortLabel: 'Daily',
-    color: '#C89437', // medium gold-tan
+    color: '#94A3B8', // --daily
     type: 'batch',
     cadence: 'every 24 hours',
     description: 'Predictions recomputed on a schedule every 24 hours.',
@@ -21,7 +21,7 @@ export const PIPELINE_META = {
     key: 'batch_weekly',
     label: 'Batch Weekly',
     shortLabel: 'Weekly',
-    color: '#966324', // dark gold-tan / bronze
+    color: '#64748B', // --weekly
     type: 'batch',
     cadence: 'every 7 days',
     description: 'Predictions recomputed on a schedule every 7 days.',
@@ -30,7 +30,7 @@ export const PIPELINE_META = {
     key: 'streaming',
     label: 'Real-Time Processing',
     shortLabel: 'Real-Time',
-    color: '#7A4E24', // dark brown
+    color: '#0D9488', // --realtime
     type: 'realtime',
     cadence: 'continuous',
     description: 'Kafka + Redis: prediction updates on every purchase.',
@@ -40,12 +40,24 @@ export const PIPELINE_META = {
 export const ORDERED_PIPELINES = ['batch_hourly', 'batch_daily', 'batch_weekly', 'streaming'];
 
 export const THEME = {
-  bgCream: '#FBF6EC',
-  cardBg: '#FFFFFF',
-  goldAccent: '#E3B95B',
-  goldBorder: 'rgba(227, 185, 91, 0.45)',
-  goldBorderStrong: '#E3B95B',
-  brownHeadings: '#7A4E24',
-  textDark: '#1E1E1E',
-  textMuted: '#685D52',
+  bg: '#F6F7F8',
+  card: '#FFFFFF',
+  text: '#111827',
+  muted: '#6B7280',
+  primary: '#0F172A',
+  onPrimary: '#F6F7F8',
+  accent: '#2DD4BF',
+  border: '#E2E5EA',
+  hourly: '#CBD5E1',
+  daily: '#94A3B8',
+  weekly: '#64748B',
+  realtime: '#0D9488',
+  realtimeText: '#0F766E',
+  focusRing: '#0D9488',
+  status: {
+    correct: { text: '#166534', bg: '#DCFCE7' },
+    top3: { text: '#854D0E', bg: '#FEF9C3' },
+    wrong: { text: '#991B1B', bg: '#FEE2E2' },
+    neutral: { text: '#374151', bg: '#E2E5EA' },
+  },
 };

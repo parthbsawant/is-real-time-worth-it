@@ -162,8 +162,8 @@ export default function Home() {
             Kafka + Redis: the prediction updates on every purchase.
           </p>
           <div className="nav-card-chips">
-            <span className="stat-chip">Top-1 {rtTop1Str}</span>
-            <span className="stat-chip">Staleness {rtStalenessStr}</span>
+            <span className="stat-chip stat-chip-realtime">Top-1 {rtTop1Str}</span>
+            <span className="stat-chip stat-chip-realtime">Staleness {rtStalenessStr}</span>
           </div>
           <div className="nav-card-bottom">
             <span>Open</span>
